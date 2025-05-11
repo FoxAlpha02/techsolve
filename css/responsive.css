@@ -1,0 +1,215 @@
+/* 
+   Responsive CSS
+   Tech Training Institute
+*/
+
+/* Large Devices (desktops, less than 1200px) */
+@media (max-width: 1199.98px) {
+    .program-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+    
+    .footer-widgets {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+    }
+
+    .container {
+        padding: 0 30px;
+    }
+}
+
+/* Medium Devices (tablets, less than 992px) */
+@media (max-width: 991.98px) {
+    .courses-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+    
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .hero-slider .slide-content {
+        max-width: 80%;
+    }
+
+    .hero-slider .slide-content h2 {
+        font-size: 2.5rem;
+    }
+}
+
+/* Small Devices (landscape phones, less than 768px) */
+@media (max-width: 767.98px) {
+    .menu-toggle {
+        display: block;
+        font-size: 24px;
+        color: var(--dark-color);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .menu-toggle:hover {
+        color: var(--primary-color);
+    }
+    
+    .nav-menu {
+        position: fixed;
+        top: 80px;
+        left: -100%;
+        width: 100%;
+        height: calc(100vh - 80px);
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 20px 0;
+        transition: 0.3s ease-in-out;
+        overflow-y: auto;
+    }
+    
+    .nav-menu.active {
+        left: 0;
+    }
+    
+    .nav-menu li {
+        margin: 10px 0;
+    }
+    
+    .nav-menu li a {
+        padding: 15px 20px;
+        display: block;
+        font-size: 1.1rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dropdown {
+        position: static;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0;
+        display: none;
+    }
+    
+    .dropdown.active {
+        display: block;
+    }
+    
+    .dropdown li a {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+    
+    .program-cards,
+    .courses-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .hero-slider .slide-content {
+        max-width: 100%;
+        padding: 0 20px;
+    }
+    
+    .hero-slider .slide-content h2 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    
+    .hero-slider .slide-content p {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    
+    .contact-form {
+        padding: 30px 20px;
+    }
+    
+    .footer-widgets {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+/* Extra Small Devices (phones, less than 576px) */
+@media (max-width: 575.98px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .top-bar {
+        flex-direction: column;
+        padding: 10px 0;
+    }
+    
+    .contact-info,
+    .social-links {
+        width: 100%;
+        justify-content: center;
+        margin: 5px 0;
+    }
+    
+    .hero-slider .slide-content h2 {
+        font-size: 1.75rem;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+    }
+    
+    .gallery-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .testimonial-card {
+        padding: 20px;
+    }
+}
+
+/* Animation Keyframes */
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
