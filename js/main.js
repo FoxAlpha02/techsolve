@@ -44,6 +44,337 @@ document.addEventListener('DOMContentLoaded', function() {
     initMenuNavigation();
 });
 
+// Modern website interactions and effects
+
+// Cursor effects
+const createCustomCursor = () => {
+    const cursor = document.createElement('div');
+    const cursorDot = document.createElement('div');
+    cursor.className = 'custom-cursor';
+    cursorDot.className = 'cursor-dot';
+    document.body.appendChild(cursor);
+    document.body.appendChild(cursorDot);
+
+    let cursorVisible = true;
+    let cursorEnlarged = false;
+
+    document.addEventListener('mousemove', (e) => {
+        if (cursorVisible) {
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.16,
+                ease: 'power3.out'
+            });
+            gsap.to(cursorDot, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1
+            });
+        }
+    });
+
+    // Hover effect for links and buttons
+    const handleMouseEnter = () => {
+        if (!cursorEnlarged) {
+            cursorEnlarged = true;
+            gsap.to(cursor, {
+                scale: 2,
+                duration: 0.2
+            });
+            gsap.to(cursorDot, {
+                scale: 0.5,
+                duration: 0.2
+            });
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (cursorEnlarged) {
+            cursorEnlarged = false;
+            gsap.to(cursor, {
+                scale: 1,
+                duration: 0.2
+            });
+            gsap.to(cursorDot, {
+                scale: 1,
+                duration: 0.2
+            });
+        }
+    };
+
+    document.querySelectorAll('a, button, .interactive').forEach(el => {
+        el.addEventListener('mouseenter', handleMouseEnter);
+        el.addEventListener('mouseleave', handleMouseLeave);
+    });
+};
+
+// Magnetic buttons effect
+const initMagneticButtons = () => {
+    const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
+    
+    buttons.forEach(button => {
+        button.addEventListener('mousemove', (e) => {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            gsap.to(button, {
+                x: (x - rect.width / 2) / rect.width * 20,
+                y: (y - rect.height / 2) / rect.height * 20,
+                duration: 0.3,
+                ease: 'power3.out'
+            });
+        });
+        
+        button.addEventListener('mouseleave', () => {
+            gsap.to(button, {
+                x: 0,
+                y: 0,
+                duration: 0.5,
+                ease: 'elastic.out(1, 0.3)'
+            });
+        });
+    });
+};
+
+// Modern image reveal effect
+const initImageReveal = () => {
+    const images = document.querySelectorAll('.reveal-image');
+    
+    images.forEach(image => {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('image-reveal-wrapper');
+        image.parentNode.insertBefore(wrapper, image);
+        wrapper.appendChild(image);
+        
+        gsap.set(wrapper, { overflow: 'hidden' });
+        gsap.set(image, { scale: 1.2 });
+        
+        ScrollTrigger.create({
+            trigger: wrapper,
+            start: 'top 80%',
+            onEnter: () => {
+                gsap.to(image, {
+                    scale: 1,
+                    duration: 1.5,
+                    ease: 'power3.out'
+                });
+            }
+        });
+    });
+};
+
+// Smooth section transitions
+const initSectionTransitions = () => {
+    const sections = document.querySelectorAll('section');
+    
+    sections.forEach(section => {
+        gsap.from(section, {
+            scrollTrigger: {
+                trigger: section,
+                start: 'top 80%',
+                toggleActions: 'play none none reverse'
+            },
+            y: 50,
+            opacity: 0,
+            duration: 1,
+            ease: 'power3.out'
+        });
+    });
+};
+
+// Dynamic background effect
+const initDynamicBackground = () => {
+    const canvas = document.createElement('canvas');
+    canvas.classList.add('background-canvas');
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    
+    const particles = [];
+    const properties = {
+        particleCount: 50,
+        particleSize: 3,
+        speed: 1,
+        connectDistance: 100
+    };
+    
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = Math.random() * properties.speed * 2 - properties.speed;
+            this.vy = Math.random() * properties.speed * 2 - properties.speed;
+        }
+        
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            
+            if (this.x < 0 || this.x > width) this.vx = -this.vx;
+            if (this.y < 0 || this.y > height) this.vy = -this.vy;
+        }
+    }
+    
+    const init = () => {
+        for (let i = 0; i < properties.particleCount; i++) {
+            particles.push(new Particle());
+        }
+        animate();
+    };
+    
+    const animate = () => {
+        ctx.clearRect(0, 0, width, height);
+        
+        particles.forEach(particle => {
+            particle.update();
+            
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, properties.particleSize, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(79, 70, 229, 0.1)';
+            ctx.fill();
+            
+            particles.forEach(particle2 => {
+                const dx = particle.x - particle2.x;
+                const dy = particle.y - particle2.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < properties.connectDistance) {
+                    ctx.beginPath();
+                    ctx.moveTo(particle.x, particle.y);
+                    ctx.lineTo(particle2.x, particle2.y);
+                    ctx.strokeStyle = `rgba(79, 70, 229, ${1 - distance / properties.connectDistance})`;
+                    ctx.stroke();
+                }
+            });
+        });
+        
+        requestAnimationFrame(animate);
+    };
+    
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+    
+    init();
+};
+
+// Text splitting animation
+const initTextSplitting = () => {
+    const headings = document.querySelectorAll('h1, h2');
+    
+    headings.forEach(heading => {
+        const text = heading.textContent;
+        heading.textContent = '';
+        
+        [...text].forEach((char, i) => {
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.style.opacity = '0';
+            span.style.transform = 'translateY(20px)';
+            heading.appendChild(span);
+            
+            gsap.to(span, {
+                scrollTrigger: {
+                    trigger: heading,
+                    start: 'top 80%'
+                },
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                delay: i * 0.05
+            });
+        });
+    });
+};
+
+// Initialize all modern effects
+document.addEventListener('DOMContentLoaded', () => {
+    createCustomCursor();
+    initMagneticButtons();
+    initImageReveal();
+    initSectionTransitions();
+    initDynamicBackground();
+    initTextSplitting();
+    
+    // Add smooth scrolling with GSAP ScrollToPlugin
+    gsap.registerPlugin(ScrollToPlugin);
+    
+    // Initialize custom scroll progress
+    const progressBar = document.createElement('div');
+    progressBar.className = 'scroll-progress';
+    document.body.appendChild(progressBar);
+    
+    window.addEventListener('scroll', () => {
+        const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = (window.scrollY / windowHeight) * 100;
+        progressBar.style.transform = `scaleX(${scrolled / 100})`;
+    });
+});
+
+// Add CSS for new effects
+const style = document.createElement('style');
+style.textContent = `
+    .custom-cursor {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--primary-color);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition: width 0.3s, height 0.3s;
+        mix-blend-mode: difference;
+    }
+    
+    .cursor-dot {
+        width: 4px;
+        height: 4px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+    }
+    
+    .background-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        opacity: 0.5;
+    }
+    
+    .image-reveal-wrapper {
+        overflow: hidden;
+    }
+    
+    .reveal-image {
+        transform-origin: center;
+        will-change: transform;
+    }
+    
+    .scroll-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        transform-origin: left;
+        transform: scaleX(0);
+        z-index: 1000;
+    }
+`;
+
+document.head.appendChild(style);
+
 /**
  * Initialize the mobile navigation
  */
@@ -96,85 +427,128 @@ function initMobileNav() {
 function initSlider() {
     const slides = document.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.dot[data-slide]'); // Ensure dots have data-slide attribute
-    const prevTech = document.querySelector('.prev-slide');
-    const nextTech = document.querySelector('.next-slide');
+    const prevBtn = document.querySelector('.prev-slide');
+    const nextBtn = document.querySelector('.next-slide');
     
     if (!slides.length || slides.length < 2) return; // Don't init if less than 2 slides
     
     let currentSlide = 0;
-    let slideInterval;
-
-    // Show initial slide
-    slides[currentSlide].classList.add('active');
-    if (dots[currentSlide]) {
-        dots[currentSlide].classList.add('active');
-    }
-
+    let slideInterval = setInterval(nextSlide, 5000);
+    let isAnimating = false;
+    
     function showSlide(index) {
-        // Remove active class from current slide/dot
-        slides[currentSlide].classList.remove('active');
-        if (dots[currentSlide]) {
-            dots[currentSlide].classList.remove('active');
+        if (isAnimating || index < 0 || index >= slides.length) return;
+        isAnimating = true;
+        
+        // Remove active class from all slides and dots
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        // Add active class to current slide and dot
+        slides[index].classList.add('active');
+        if (dots[index]) { // Check if dot exists
+        dots[index].classList.add('active');
         }
+        
 
-        // Update current slide index
-        currentSlide = index;
-
-        // Add active class to new slide/dot
-        slides[currentSlide].classList.add('active');
-        if (dots[currentSlide]) {
-            dots[currentSlide].classList.add('active');
-        }
+        // Allow next animation after transition ends (adjust time if needed)
+        setTimeout(() => {
+            isAnimating = false;
+        }, 1000);
     }
-
+    
     function nextSlide() {
-        let next = currentSlide + 1;
-        if (next >= slides.length) {
-            next = 0;
-        }
-        showSlide(next);
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
     }
-
+    
     function prevSlide() {
-        let prev = currentSlide - 1;
-        if (prev < 0) {
-            prev = slides.length - 1;
-        }
-        showSlide(prev);
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(currentSlide);
     }
-
-    // Start auto-sliding
-    function startAutoSlide() {
-        if (slideInterval) {
-            clearInterval(slideInterval);
-        }
-        slideInterval = setInterval(nextSlide, 3000);
-    }
-
-    // Initialize auto-sliding
-    startAutoSlide();
-
+    
     // Event listeners for dots
-    dots.forEach((dot, index) => {
+    dots.forEach((dot) => { // Removed index as we use data-slide
         dot.addEventListener('click', () => {
-            showSlide(index);
-            startAutoSlide(); // Reset interval after manual navigation
+            const slideIndex = parseInt(dot.getAttribute('data-slide')); // Get index from data attribute
+            if (!isNaN(slideIndex) && currentSlide !== slideIndex) {
+                currentSlide = slideIndex;
+                showSlide(currentSlide);
+                resetInterval();
+            }
         });
     });
     
     // Event listeners for prev/next buttons
-    if (prevTech) {
-        prevTech.addEventListener('click', () => {
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
             prevSlide();
-            startAutoSlide(); // Reset interval after manual navigation
+            resetInterval();
         });
     }
     
-    if (nextTech) {
-        nextTech.addEventListener('click', () => {
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
             nextSlide();
-            startAutoSlide(); // Reset interval after manual navigation
+            resetInterval();
         });
+    }
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+            prevSlide();
+            resetInterval();
+        } else if (e.key === 'ArrowRight') {
+            nextSlide();
+            resetInterval();
+        }
+    });
+    
+    // Reset interval on interaction
+    function resetInterval() {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(nextSlide, 5000);
+    }
+    
+    // Pause slider on hover
+    const sliderContainer = document.querySelector('.slider-container');
+    if (sliderContainer) {
+        sliderContainer.addEventListener('mouseenter', () => {
+            clearInterval(slideInterval);
+        });
+        
+        sliderContainer.addEventListener('mouseleave', () => {
+            resetInterval(); // Restart interval
+        });
+    }
+    
+    // Touch events for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    if (sliderContainer) {
+        sliderContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        sliderContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+    }
+    
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // Swipe left - next slide
+            nextSlide();
+            resetInterval();
+        } else if (touchEndX > touchStartX + swipeThreshold) {
+            // Swipe right - previous slide
+            prevSlide();
+            resetInterval();
+        }
     }
 }
 
@@ -337,22 +711,22 @@ function initCounterAnimation() {
  */
 function initGallery() {
     const galleryItems = document.querySelectorAll('.gallery-item');
-    const filterTechs = document.querySelectorAll('.filter-tech');
+    const filterButtons = document.querySelectorAll('.filter-btn');
     const modal = document.querySelector('.gallery-modal');
     const galleryContainer = document.querySelector('.gallery-container'); // Need the container
     
     if (!galleryContainer || !galleryItems.length) return; // Check container too
     
     // Gallery filtering
-    if (filterTechs.length) {
-        filterTechs.forEach(tech => {
-            tech.addEventListener('click', () => {
+    if (filterButtons.length) {
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
                 // Update active button
-                filterTechs.forEach(t => t.classList.remove('active'));
-                tech.classList.add('active');
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
                 
                 // Filter items
-                const filterValue = tech.getAttribute('data-filter');
+                const filterValue = button.getAttribute('data-filter');
                 
                 galleryItems.forEach(item => {
                     const itemCategory = item.getAttribute('data-category');
@@ -377,7 +751,7 @@ function initGallery() {
                          // Hide after transition
                         setTimeout(() => {
                             // Only hide if it still doesn't match (in case filter changed quickly)
-                            const currentFilterValue = document.querySelector('.filter-tech.active').getAttribute('data-filter');
+                            const currentFilterValue = document.querySelector('.filter-btn.active').getAttribute('data-filter');
                             if (currentFilterValue !== 'all' && itemCategory !== currentFilterValue) {
                             item.style.display = 'none';
                             }
@@ -393,8 +767,8 @@ function initGallery() {
         const modalImg = modal.querySelector('.gallery-full-img');
         const modalCaption = modal.querySelector('.gallery-caption');
         const closeButton = modal.querySelector('.gallery-close');
-        const prevTech = modal.querySelector('.gallery-prev');
-        const nextTech = modal.querySelector('.gallery-next');
+        const prevButton = modal.querySelector('.gallery-prev');
+        const nextButton = modal.querySelector('.gallery-next');
         
         let currentIndex = 0;
         let visibleGalleryArray = []; // Array of currently visible items for navigation
@@ -494,12 +868,12 @@ function initGallery() {
             closeButton.addEventListener('click', closeModal);
         }
         
-        if (prevTech) {
-            prevTech.addEventListener('click', showPrev);
+        if (prevButton) {
+            prevButton.addEventListener('click', showPrev);
         }
         
-        if (nextTech) {
-            nextTech.addEventListener('click', showNext);
+        if (nextButton) {
+            nextButton.addEventListener('click', showNext);
         }
         
         // Close modal when clicking outside of the image/controls
@@ -531,7 +905,7 @@ function initGallery() {
 function initCourseSearch() {
     const searchInput = document.getElementById('courseSearchInput');
     const categoryFilter = document.getElementById('categoryFilter');
-    const searchTech = document.getElementById('searchTech');
+    const searchButton = document.getElementById('searchButton');
     const searchResultsContainer = document.querySelector('.search-results'); // container
     const courseResults = searchResultsContainer ? searchResultsContainer.querySelectorAll('.course-result') : []; // items inside
     const emptyMessage = searchResultsContainer ? searchResultsContainer.querySelector('.search-empty') : null; // empty message inside
@@ -614,8 +988,8 @@ function initCourseSearch() {
     }
     
     // Event listeners
-    if (searchTech) {
-        searchTech.addEventListener('click', performSearch);
+    if (searchButton) {
+        searchButton.addEventListener('click', performSearch);
     }
     
     if (searchInput) {
@@ -640,7 +1014,7 @@ function initCourseSearch() {
     // Add CSS for highlighting if not already present
      if (!document.getElementById('highlight-style')) {
     const style = document.createElement('style');
-         style.id = 'highlight-style'; // Give it an ID to prevent duplicates
+        style.id = 'highlight-style'; // Give it an ID to prevent duplicates
     style.textContent = `
         .highlight {
             background-color: yellow;
@@ -719,7 +1093,7 @@ function initContactForm() {
         const subjectField = contactForm.querySelector('#subject');
         const messageField = contactForm.querySelector('#message');
         const formMessage = contactForm.querySelector('.form-message'); // For success/general errors
-        const submitTech = contactForm.querySelector('button[type="submit"]');
+        const submitButton = contactForm.querySelector('button[type="submit"]');
         
         // Validation flags
         let isValid = true;
@@ -759,19 +1133,19 @@ function initContactForm() {
         
         // If form is valid, simulate submission
         if (isValid) {
-            if (submitTech) {
-                submitTech.disabled = true;
-                submitTech.classList.add('submitting'); // Add class for spinner
-                submitTech.innerHTML = 'Sending...'; // Change text
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.classList.add('submitting'); // Add class for spinner
+                submitButton.innerHTML = 'Sending...'; // Change text
             }
 
 
             // Simulate form submission (replace with actual fetch/AJAX call)
             setTimeout(() => {
-                 if (submitTech) {
-                     submitTech.disabled = false;
-                     submitTech.classList.remove('submitting');
-                     submitTech.innerHTML = 'Send Message'; // Restore text
+                 if (submitButton) {
+                     submitButton.disabled = false;
+                     submitButton.classList.remove('submitting');
+                     submitButton.innerHTML = 'Send Message'; // Restore text
                  }
 
                 
@@ -865,21 +1239,21 @@ function initContactForm() {
  * Initialize back to top button functionality
  */
 function initBackToTop() {
-    const backToTopTech = document.getElementById('backToTop');
+    const backToTopBtn = document.getElementById('backToTop');
     
-    if (!backToTopTech) return;
+    if (!backToTopBtn) return;
     
     // Show/hide button based on scroll position
     window.addEventListener('scroll', () => {
         if (window.pageYOffset > 300) {
-            backToTopTech.classList.add('visible');
+            backToTopBtn.classList.add('visible');
         } else {
-            backToTopTech.classList.remove('visible');
+            backToTopBtn.classList.remove('visible');
         }
     });
     
     // Smooth scroll to top
-    backToTopTech.addEventListener('click', (e) => {
+    backToTopBtn.addEventListener('click', (e) => {
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
@@ -896,7 +1270,7 @@ function initNewsletterForm() {
     newsletterForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const emailInput = newsletterForm.querySelector('input[type="email"]');
-        const submitTech = newsletterForm.querySelector('button[type="submit"]');
+        const submitBtn = newsletterForm.querySelector('button[type="submit"]');
         const email = emailInput ? emailInput.value.trim() : '';
         
         // Simple validation
@@ -913,10 +1287,10 @@ function initNewsletterForm() {
         }
         
         // Add loading state
-        if (submitTech) {
-            submitTech.disabled = true;
+        if (submitBtn) {
+            submitBtn.disabled = true;
             // Basic loading text, could add a spinner span if needed
-            submitTech.textContent = 'Subscribing...';
+            submitBtn.textContent = 'Subscribing...';
         }
         
         // Simulate server request
@@ -926,9 +1300,9 @@ function initNewsletterForm() {
             
             // Reset form and button
             newsletterForm.reset();
-            if (submitTech) {
-                submitTech.disabled = false;
-                submitTech.textContent = 'Subscribe'; // Restore original text
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Subscribe'; // Restore original text
             }
         }, 1500);
     });
@@ -1013,7 +1387,7 @@ const courseData = {
         fee: "TK. 10,000 (Regular: TK. 12,000)",
         mode: "Online & Offline (Hybrid)",
         trainer: "John Smith", // Example
-        location: "BITM Training Lab, Dhaka", // Example
+        location: "TechsolveTraining Lab, Dhaka", // Example
         overview: "This comprehensive Digital Marketing course covers SEO, SEM, social media marketing, content strategy, email marketing, and analytics. Learn the tools and techniques to drive online growth."
     },
     2: {
@@ -1024,7 +1398,7 @@ const courseData = {
         fee: "TK. 21,000 (Regular: TK. 25,000)",
         mode: "Online & Offline (Hybrid)",
         trainer: "Sarah Johnson", // Example
-        location: "BITM Training Lab, Dhaka", // Example
+        location: "TECHSOLVE Training Lab, Dhaka", // Example
         overview: "Become a full-stack web developer. Master HTML, CSS, JavaScript, popular frameworks like React or Angular, Node.js, databases, and deployment strategies for building modern web applications."
     },
     3: {
@@ -1035,9 +1409,10 @@ const courseData = {
         fee: "TK. 42,900",
         mode: "Online & Offline (Hybrid)",
         trainer: "Michael Chen", // Example
-        location: "BITM Training Lab, Dhaka", // Example
+        location: "TECHSOLVE Training Lab, Dhaka", // Example
         overview: "An advanced program covering visual communication principles, typography, layout design, branding, UI/UX fundamentals, and industry-standard software like Adobe Creative Suite. Build a professional portfolio."
     }
+
     // Add more courses if needed
 };
 
@@ -1053,8 +1428,8 @@ function initCourseEnrollment() {
     const authTabs = modal.querySelectorAll('.auth-tab');
     const authForms = modal.querySelectorAll('.auth-form');
     const singleCourseView = modal.querySelector('.single-course-view');
-    const listView = modal.querySelector('.list-view');
-    
+    const listView = modal.querySelector('.list-view'); // The container for the list
+
     // Handle "Enrol Now" clicks on course cards
     document.querySelectorAll('.enroll-link').forEach(link => {
         link.addEventListener('click', function(e) {
@@ -1414,4 +1789,4 @@ if (!document.getElementById('modal-animation-style')) {
         }
     `;
     document.head.appendChild(style);
-    }
+}
